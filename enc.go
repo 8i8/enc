@@ -6,6 +6,8 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
+
+	"github.com/8i8/lib/log"
 )
 
 type Encoder interface {
@@ -100,7 +102,7 @@ func (s *settings) Setup(args ...string) {
 		case "capital":
 			s.CAPITAL = true
 		default:
-			Err(nil, "encoding", "Setup", "Unknown argument")
+			log.Err(nil, "encoding", "Setup", "Unknown argument")
 		}
 	}
 }

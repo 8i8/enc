@@ -1,5 +1,5 @@
 // enc requires the package github.com/atotto/clipboard
-package main
+package cmd
 
 import (
 	"bufio"

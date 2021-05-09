@@ -1,8 +1,8 @@
-module github.com/8i8/lib/enc
+module github.com/8i8/enc
 
-go 1.15
+go 1.16
 
 require (
-	github.com/8i8/lib/log v0.0.3
-	github.com/atotto/clipboard v0.1.2 // indirect
+	github.com/8i8/log v0.0.8
+	github.com/atotto/clipboard v0.1.4
 )

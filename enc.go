@@ -7,7 +7,7 @@ import (
 	"crypto/sha512"
 	"fmt"
 
-	"github.com/8i8/lib/log"
+	"github.com/8i8/log"
 )
 
 type Encoder interface {

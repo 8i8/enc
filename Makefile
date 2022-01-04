@@ -1,11 +1,11 @@
 all:
-	go run cmd/cli/cli.go
+	go run cmd/env.go
 
 build:
-	go build -o enc cmd/cli/cli.go
+	go build -o enc cmd/env.go
 
 install:
-	go build -o enc cmd/cli/cli.go
+	go build -o enc cmd/env.go
 	mv enc ~/.bin
 
 clean:

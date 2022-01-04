@@ -35,6 +35,9 @@ type settings struct {
 	// CAPITAL capitalises the last letter in the sha for cases in which a capital
 	// letter is a requirment.
 	CAPITAL bool
+	// SYMBOL repalces the last character of the string that is not
+	// upper case with a symbol.
+	SYMBOL bool
 }
 
 func (s settings) Encode(str string) string {
@@ -50,36 +53,31 @@ func (s settings) Encode(str string) string {
 	case s.MD5:
 		x := md5.Sum(input)
 		byt.WriteString(fmt.Sprintf("%x", x))
-		b := s.caps(byt.Bytes())
-		out = string(b)
 	case s.SHA256:
 		x := sha256.Sum256(input)
 		byt.WriteString(fmt.Sprintf("%x", x))
-		b := s.caps(byt.Bytes())
-		out = string(b)
 	case s.SHA384:
 		x := sha512.Sum384(input)
 		byt.WriteString(fmt.Sprintf("%x", x))
-		b := s.caps(byt.Bytes())
-		out = string(b)
 	case s.SHA512:
 		x := sha512.Sum512(input)
 		byt.WriteString(fmt.Sprintf("%x", x))
-		b := s.caps(byt.Bytes())
-		out = string(b)
 	case s.pp:
 		x := md5.Sum(input)
 		byt.WriteString(fmt.Sprintf("%x", x))
-		b := s.caps(byt.Bytes())
-		b = b[:20]
-		out = string(b)
 	default:
 		// Default hash is md5
 		x := md5.Sum(input)
 		byt.WriteString(fmt.Sprintf("%x", x))
-		b := s.caps(byt.Bytes())
-		out = string(b)
 	}
+	b := byt.Bytes()
+	if s.pp {
+		b = b[:20]
+	}
+	b = s.caps(b)
+	b = s.symbol(b)
+	out = string(b)
+
 	s = settings{} // reset all
 	return out
 }
@@ -101,6 +99,8 @@ func (s *settings) Setup(args ...string) {
 			s.pp = true
 		case "capital":
 			s.CAPITAL = true
+		case "symbol":
+			s.SYMBOL = true
 		default:
 			log.Err(nil, "encoding", "Setup", "Unknown argument")
 		}
@@ -109,6 +109,13 @@ func (s *settings) Setup(args ...string) {
 
 func isLetter(c byte) bool {
 	if c > 96 && c < 123 {
+		return true
+	}
+	return false
+}
+
+func isUpperCase(c byte) bool {
+	if c > 64 && c < 91 {
 		return true
 	}
 	return false
@@ -123,6 +130,22 @@ func (s settings) caps(b []byte) []byte {
 		for c := len(b) - 1; c > 0; c-- {
 			if isLetter(b[c]) {
 				b[c] = toUpper(b[c])
+				break
+			}
+		}
+	}
+	return b
+}
+
+func addSymbol() byte {
+	return '@'
+}
+
+func (s settings) symbol(b []byte) []byte {
+	if s.SYMBOL {
+		for c := len(b) - 1; c > 0; c-- {
+			if !isUpperCase(b[c]) {
+				b[c] = addSymbol()
 				break
 			}
 		}

@@ -1,5 +1,5 @@
 // enc requires the package github.com/atotto/clipboard
-package cmd
+package cli
 
 import (
 	"bufio"
@@ -25,13 +25,17 @@ var (
 	SHA384 = flag.Bool("sha384", false, "Output a sha384 hash.")
 	// SHA512 Input flags.
 	SHA512 = flag.Bool("sha512", false, "Output a sha512 hash.")
-	pp     = flag.Bool("pp", false, "")
+	// pp shortens the output to 20 char in length.
+	pp = flag.Bool("pp", false, "")
 	// CAPITAL capitalises the last letter in the sha for cases in which a capital
 	// letter is a requirment.
 	CAPITAL = flag.Bool("c", false, "Capitalise the last letter in the hash.")
+	// SYMBOL replace the last character that is not upper case
+	// witha symbol.
+	SYMBOL = flag.Bool("s", false, "Replace the last character that is not uppercase with an @ symbol")
 )
 
-func main() {
+func Encoder() {
 
 	// Get flags from the os on program start.
 	flag.Parse()
@@ -48,9 +52,6 @@ func main() {
 		if len(input) == 0 {
 			return
 		}
-		if *NEWLINE {
-			input = append(input, '\n')
-		}
 
 		// Set the appropriate hash for the input, the given flag or lack there
 		// of, set the hashing algorithm. The resulting hash is copied to the system
@@ -60,47 +61,43 @@ func main() {
 		case *MD5:
 			x := md5.Sum(input)
 			byt.WriteString(fmt.Sprintf("%x", x))
-			b := caps(byt.Bytes())
-			clipboard.WriteAll(string(b))
-			fmt.Println(string(b))
 		case *SHA256:
 			x := sha256.Sum256(input)
 			byt.WriteString(fmt.Sprintf("%x", x))
-			b := caps(byt.Bytes())
-			clipboard.WriteAll(string(b))
-			fmt.Println(string(b))
 		case *SHA384:
 			x := sha512.Sum384(input)
 			byt.WriteString(fmt.Sprintf("%x", x))
-			b := caps(byt.Bytes())
-			clipboard.WriteAll(string(b))
-			fmt.Println(string(b))
 		case *SHA512:
 			x := sha512.Sum512(input)
 			byt.WriteString(fmt.Sprintf("%x", x))
-			b := caps(byt.Bytes())
-			clipboard.WriteAll(string(b))
-			fmt.Println(string(b))
-		case *pp:
-			x := md5.Sum(input)
-			byt.WriteString(fmt.Sprintf("%x", x))
-			b := caps(byt.Bytes())
-			b = b[:20]
-			clipboard.WriteAll(string(b))
-			fmt.Println(string(b))
 		default:
 			// Default hash is md5
 			x := md5.Sum(input)
 			byt.WriteString(fmt.Sprintf("%x", x))
-			b := caps(byt.Bytes())
-			clipboard.WriteAll(string(b))
-			fmt.Println(string(b))
 		}
+		b := byt.Bytes()
+		if *pp {
+			b = b[:20]
+		}
+		b = caps(b)
+		b = symbol(b)
+		if *NEWLINE {
+			input = append(input, '\n')
+		}
+		clipboard.WriteAll(string(b))
+		fmt.Println(string(b))
 	}
 }
 
 func isLetter(c byte) bool {
 	if c > 96 && c < 123 {
+		return true
+	}
+	return false
+}
+
+func isUpperCase(c byte) bool {
+	if c > 64 && c < 91 {
 		return true
 	}
 	return false
@@ -115,6 +112,22 @@ func caps(b []byte) []byte {
 		for c := len(b) - 1; c > 0; c-- {
 			if isLetter(b[c]) {
 				b[c] = toUpper(b[c])
+				break
+			}
+		}
+	}
+	return b
+}
+
+func addSymbol() byte {
+	return '@'
+}
+
+func symbol(b []byte) []byte {
+	if *SYMBOL {
+		for c := len(b) - 1; c > 0; c-- {
+			if !isUpperCase(b[c]) {
+				b[c] = addSymbol()
 				break
 			}
 		}

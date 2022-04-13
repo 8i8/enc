@@ -38,6 +38,8 @@ type settings struct {
 	// SYMBOL repalces the last character of the string that is not
 	// upper case with a symbol.
 	SYMBOL bool
+	// VISIBLE when set to true, displays user input whilst it is being typed.
+	VISIBLE bool
 }
 
 func (s settings) Encode(str string) string {

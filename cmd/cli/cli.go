@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/atotto/clipboard"
+	"golang.org/x/term"
 )
 
 var (
@@ -33,6 +34,8 @@ var (
 	// SYMBOL replace the last character that is not upper case
 	// witha symbol.
 	SYMBOL = flag.Bool("s", false, "Replace the last character that is not uppercase with an @ symbol")
+	// VISIBLE sets the encoder to display user input rather then the default state of hiding it.
+	VISIBLE = flag.Bool("v", false, "Set user input to visible")
 )
 
 func Encoder() {
@@ -41,16 +44,27 @@ func Encoder() {
 	flag.Parse()
 
 	for {
-		// Read stdin.
-		scanner := bufio.NewScanner(os.Stdin)
+		var input []byte
+		var err error
+		if *VISIBLE {
+			scanner := bufio.NewScanner(os.Stdin)
+			if !scanner.Scan() {
+				return
+			}
 
-		if !scanner.Scan() {
-			return
+			input = scanner.Bytes()
+			if len(input) == 0 {
+				return
+			}
+		} else {
+			input, err = term.ReadPassword(0)
+			if err != nil {
+				panic(err)
+				return
+			}
 		}
-
-		input := scanner.Bytes()
 		if len(input) == 0 {
-			return
+			continue
 		}
 
 		// Set the appropriate hash for the input, the given flag or lack there

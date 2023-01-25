@@ -6,13 +6,11 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
-
-	"github.com/8i8/log"
 )
 
 type Encoder interface {
 	Encode(string) string
-	Setup(...string)
+	Setup(...string) error
 }
 
 func NewEncoder() Encoder {
@@ -84,7 +82,7 @@ func (s settings) Encode(str string) string {
 	return out
 }
 
-func (s *settings) Setup(args ...string) {
+func (s *settings) Setup(args ...string) error {
 	for _, str := range args {
 		switch str {
 		case "md5":
@@ -104,9 +102,10 @@ func (s *settings) Setup(args ...string) {
 		case "symbol":
 			s.SYMBOL = true
 		default:
-			log.Err(nil, "encoding", "Setup", "Unknown argument")
+			return fmt.Errorf("Unknown setup flag")
 		}
 	}
+	return nil
 }
 
 func isLetter(c byte) bool {

@@ -26,14 +26,14 @@ var (
 	SHA384 = flag.Bool("sha384", false, "Output a sha384 hash.")
 	// SHA512 Input flags.
 	SHA512 = flag.Bool("sha512", false, "Output a sha512 hash.")
-	// pp shortens the output to 20 char in length.
-	pp = flag.Bool("pp", false, "")
+	// t truncates the output to 20 char in length.
+	TRUNC = flag.Bool("t", false, "truncate length of output to 20 characters")
 	// CAPITAL capitalises the last letter in the sha for cases in which a capital
 	// letter is a requirment.
 	CAPITAL = flag.Bool("c", false, "Capitalise the last letter in the hash.")
 	// SYMBOL replace the last character that is not upper case
 	// witha symbol.
-	SYMBOL = flag.Bool("s", false, "Replace the last character that is not uppercase with an @ symbol")
+	SYMBOL = flag.Bool("s", false, "Replace the last character that is not upper case with an @ symbol")
 	// VISIBLE sets the encoder to display user input rather then the default state of hiding it.
 	VISIBLE = flag.Bool("v", false, "Set user input to visible")
 )
@@ -90,7 +90,7 @@ func Encoder() {
 			byt.WriteString(fmt.Sprintf("%x", x))
 		}
 		b := byt.Bytes()
-		if *pp {
+		if *TRUNC {
 			b = b[:20]
 		}
 		b = caps(b)

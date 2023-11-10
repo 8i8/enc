@@ -6,7 +6,7 @@ build:
 
 install:
 	go build -o enc cmd/env.go
-	mv enc ~/go/bin/enc
+	mv enc /usr/local/bin
 
 clean:
 	- rm enc

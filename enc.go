@@ -28,8 +28,8 @@ type settings struct {
 	SHA384 bool
 	// SHA512 Input flags.
 	SHA512 bool
-	// pp truncates the output to 20 characters.
-	pp bool
+	// TRUNC truncates the output to 20 characters.
+	TRUNC bool
 	// CAPITAL capitalises the last letter in the sha for cases in which a capital
 	// letter is a requirment.
 	CAPITAL bool
@@ -62,7 +62,7 @@ func (s settings) Encode(str string) string {
 	case s.SHA512:
 		x := sha512.Sum512(input)
 		byt.WriteString(fmt.Sprintf("%x", x))
-	case s.pp:
+	case s.TRUNC:
 		x := md5.Sum(input)
 		byt.WriteString(fmt.Sprintf("%x", x))
 	default:
@@ -71,7 +71,7 @@ func (s settings) Encode(str string) string {
 		byt.WriteString(fmt.Sprintf("%x", x))
 	}
 	b := byt.Bytes()
-	if s.pp {
+	if s.TRUNC {
 		b = b[:20]
 	}
 	b = s.caps(b)
@@ -95,8 +95,8 @@ func (s *settings) Setup(args ...string) error {
 			s.SHA384 = true
 		case "sha512":
 			s.SHA512 = true
-		case "pp":
-			s.pp = true
+		case "trunc":
+			s.TRUNC = true
 		case "capital":
 			s.CAPITAL = true
 		case "symbol":
